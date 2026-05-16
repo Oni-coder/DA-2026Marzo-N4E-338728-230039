@@ -1,15 +1,25 @@
 package Obligatorio.obligatorioDisenioDeAplicaciones.Hipodromo.modelo.java.test;
 
-import java.util.Date;
+import lombok.Getter;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
+@Getter
 public class Jornada {
 
-	private Date fecha;
+    private LocalDate fecha;
+    private List<Carrera> carreras = new ArrayList<>();
+    private int proximoNumero = 1;
 
-	private Carrera[] carrera;
+    public Jornada(LocalDate fecha) {
+        this.fecha = fecha;
+    }
 
-	public void agregarCarrera(Carrera carrera) {
-
-	}
+    public Carrera agregarCarrera(String nombre) {
+        Carrera carrera = new Carrera(proximoNumero++, nombre);
+        carreras.add(carrera);
+        return carrera;
+    }
 
 }
