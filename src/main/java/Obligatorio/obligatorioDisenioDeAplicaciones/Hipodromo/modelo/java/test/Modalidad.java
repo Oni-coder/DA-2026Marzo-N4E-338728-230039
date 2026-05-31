@@ -1,15 +1,19 @@
 package Obligatorio.obligatorioDisenioDeAplicaciones.Hipodromo.modelo.java.test;
 
-public class Modalidad {
+import lombok.Getter;
 
-	private String nombre;
+// Strategy: cada subclase define cómo se cobra y cómo se paga
+@Getter
+public abstract class Modalidad {
 
-	public Double calcularCosto(Double monto) {
-		return null;
-	}
+    private String nombre;
 
-	public Double calcularPago(Double monto, Double dividendo, String contexto) {
-		return null;
-	}
+    public Modalidad(String nombre) {
+        this.nombre = nombre;
+    }
+
+    public abstract double calcularCosto(double montoNeto);
+
+    public abstract double calcularPago(double montoNeto, double dividendo, Participacion participacion);
 
 }
