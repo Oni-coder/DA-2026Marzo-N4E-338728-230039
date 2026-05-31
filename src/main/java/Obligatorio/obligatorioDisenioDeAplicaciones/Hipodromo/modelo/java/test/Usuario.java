@@ -15,8 +15,12 @@ public abstract class Usuario {
         this.nombreCompleto = nombreCompleto;
     }
 
-    public boolean login(String nombreUsuario, String contrasena) {
-        return this.nombreUsuario.equals(nombreUsuario) && this.contrasena.equals(contrasena);
+    public boolean coincideContrasena(String pwd) {
+        return this.contrasena != null && this.contrasena.equals(pwd);
     }
 
+    @Override
+    public String toString() {
+        return nombreCompleto;
+    }
 }

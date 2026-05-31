@@ -1,7 +1,6 @@
 package Obligatorio.obligatorioDisenioDeAplicaciones.Hipodromo.modelo.java.test;
 
 import lombok.Getter;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,8 +8,8 @@ import java.util.List;
 public class Hipodromo {
 
     private double porcentajeComision;
-    private List<Usuario> usuarios = new ArrayList<>();
     private List<Jornada> jornadas = new ArrayList<>();
+    private List<Caballo> caballos = new ArrayList<>();
 
     public Hipodromo(double porcentajeComision) {
         this.porcentajeComision = porcentajeComision;
@@ -20,11 +19,13 @@ public class Hipodromo {
         this.porcentajeComision = porcentaje;
     }
 
-    public void agregarUsuario(Usuario usuario) {
-        usuarios.add(usuario);
+    public Caballo agregarCaballo(String nombre) {
+        Caballo caballo = new Caballo(nombre);
+        caballos.add(caballo);
+        return caballo;
     }
 
-    public Jornada getOCrearJornada(LocalDate fecha) {
+    public Jornada getOCrearJornada(java.time.LocalDate fecha) {
         return jornadas.stream()
                 .filter(j -> j.getFecha().equals(fecha))
                 .findFirst()
@@ -34,5 +35,4 @@ public class Hipodromo {
                     return j;
                 });
     }
-
 }

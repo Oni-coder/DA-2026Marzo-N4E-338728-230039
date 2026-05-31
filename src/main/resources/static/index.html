@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hipódromo - Inicio</title>
+    <link rel="stylesheet" href="CSSs/main.css">
+</head>
+<body class="pagina-centrada">
+    <main>
+        <div class="tarjeta" style="max-width:520px;">
+            <h1>Hipódromo</h1>
+            <p class="subtitulo">Sistema de gestión de carreras y apuestas</p>
+            <div class="menu-grilla">
+                <div class="menu-opcion">
+                    <h3>Jugador</h3>
+                    <p>Acceder para ver carreras disponibles y realizar apuestas.</p>
+                    <button class="btn btn-primario" onclick="window.location.href='loginJugador.html'">
+                        Ingresar como Jugador
+                    </button>
+                </div>
+                <div class="menu-opcion">
+                    <h3>Administrador</h3>
+                    <p>Gestionar jornadas, carreras y estados del sistema.</p>
+                    <button class="btn btn-oscuro" onclick="window.location.href='loginAdmin.html'">
+                        Ingresar como Admin
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

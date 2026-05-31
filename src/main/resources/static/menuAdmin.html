@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hipódromo - Admin</title>
+    <link rel="stylesheet" href="CSSs/main.css">
+</head>
+<body>
+    <div class="app-layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="app-logo">Hipódromo</div>
+                <div class="usuario-info" id="nombreCompleto">Cargando...</div>
+            </div>
+            <nav class="sidebar-nav">
+                <button class="sidebar-btn activo"
+                    onclick="cargarContenido('tableroAdmin.html', this)">
+                    Tablero de Control
+                </button>
+            </nav>
+            <div class="sidebar-footer">
+                <button class="btn-logout" onclick="logout()">Cerrar Sesión</button>
+            </div>
+        </aside>
+        <main class="contenido-principal">
+            <iframe id="frame" src="tableroAdmin.html"></iframe>
+        </main>
+    </div>
+
+    <script type="module">
+        import dispatcher from './CommandDispatcher.js';
+
+        dispatcher.mapFunctions({
+            nombreCompleto: (nombre) => {
+                document.getElementById('nombreCompleto').textContent = 'Admin: ' + nombre;
+            },
+            usuarioNoAutenticado: (url) => { window.location.href = url; }
+        }, {
+            onException: (msg) => alert(msg)
+        });
+
+        dispatcher.submit('/menuAdmin/vistaConectada', {}, 'GET');
+
+        window.cargarContenido = (pagina, btn) => {
+            document.getElementById('frame').src = pagina;
+            document.querySelectorAll('.sidebar-btn').forEach(b => b.classList.remove('activo'));
+            btn.classList.add('activo');
+        };
+
+        window.logout = () => {
+            dispatcher.submit('/acceso/logoutAdmin', {});
+        };
+    </script>
+</body>
+</html>

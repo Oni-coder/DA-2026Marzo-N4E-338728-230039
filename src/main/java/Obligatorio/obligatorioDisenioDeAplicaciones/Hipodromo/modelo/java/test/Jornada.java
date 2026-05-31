@@ -18,8 +18,8 @@ public class Jornada {
 
     public Carrera agregarCarrera(String nombre) {
         Carrera carrera = new Carrera(proximoNumero++, nombre);
+        carrera.setJornada(this);
         carreras.add(carrera);
         return carrera;
     }
-
 }

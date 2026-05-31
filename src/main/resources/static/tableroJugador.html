@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Tablero Jugador</title>
+    <link rel="stylesheet" href="CSSs/main.css">
+    <style>
+        html, body { height: 100%; overflow-y: auto; }
+        .stats-bar { display: flex; gap: 18px; flex-wrap: wrap; background: #1a3a5c; color: #fff; border-radius: 8px; padding: 14px 18px; margin-bottom: 18px; }
+        .stat-item .stat-label { font-size: .75rem; color: rgba(255,255,255,.65); text-transform: uppercase; }
+        .stat-item .stat-valor { font-size: 1.1rem; font-weight: 700; color: #a9dfbf; }
+        .stat-item .stat-valor.saldo { color: #f9e79f; }
+        .stat-item .stat-valor.ganado { color: #a9dfbf; }
+        .seccion-titulo { font-size: .9rem; font-weight: 700; color: #1a3a5c; text-transform: uppercase; letter-spacing: .5px; margin: 18px 0 8px; border-bottom: 2px solid #d4ac0d; padding-bottom: 4px; }
+        .carrera-disp { background: #fff; border-radius: 8px; padding: 12px 14px; margin-bottom: 10px; box-shadow: 0 1px 4px rgba(0,0,0,.06); }
+        .carrera-disp-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .carrera-disp-nombre { font-weight: 600; color: #1a3a5c; }
+        .caballos-lista { display: flex; flex-wrap: wrap; gap: 8px; }
+        .caballo-btn { background: #f0f3f7; border: 1px solid #ddd; border-radius: 6px; padding: 6px 12px; cursor: pointer; font-size: .85rem; transition: all .15s; }
+        .caballo-btn:hover { background: #1a3a5c; color: #fff; border-color: #1a3a5c; }
+        .caballo-btn.seleccionado { background: #1a3a5c; color: #fff; border-color: #d4ac0d; }
+        .form-apuesta { background: #fff; border-radius: 10px; padding: 18px; box-shadow: 0 2px 8px rgba(0,0,0,.07); margin-bottom: 18px; }
+        .panel-confirmar { background: #fff; border: 2px solid #d4ac0d; border-radius: 10px; padding: 18px; margin-bottom: 18px; display: none; }
+        .panel-confirmar h3 { color: #1a3a5c; margin-bottom: 12px; font-size: 1rem; }
+        .preview-item { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid #f0f0f0; font-size: .9rem; }
+        .preview-item:last-child { border-bottom: none; }
+        .preview-label { color: #666; }
+        .preview-valor { font-weight: 600; }
+        table { width: 100%; border-collapse: collapse; font-size: .85rem; }
+        th { background: #f0f3f7; color: #1a3a5c; padding: 8px 10px; text-align: left; font-weight: 600; }
+        td { padding: 7px 10px; border-bottom: 1px solid #f0f0f0; }
+        .estado-por-correr { color: #1a5276; }
+        .estado-finalizada  { color: #1e8449; }
+        .msg-ok    { background: #d5f5e3; color: #1e8449; padding: 10px 14px; border-radius: 6px; margin-bottom: 14px; display: none; }
+        .msg-error { background: #fadbd8; color: #c0392b; padding: 10px 14px; border-radius: 6px; margin-bottom: 14px; display: none; }
+        .sin-carreras { color: #888; font-size: .9rem; padding: 8px 0; }
+    </style>
+</head>
+<body class="pagina-interna">
+
+    <h2>Tablero del Jugador</h2>
+    <div id="msgDiv" class="msg-ok"></div>
+
+    <!-- Stats -->
+    <div class="stats-bar">
+        <div class="stat-item"><div class="stat-label">Jugador</div><div class="stat-valor" id="statNombre">—</div></div>
+        <div class="stat-item"><div class="stat-label">Saldo</div><div class="stat-valor saldo">$<span id="statSaldo">—</span></div></div>
+        <div class="stat-item"><div class="stat-label">Total Apostado</div><div class="stat-valor">$<span id="statApostado">—</span></div></div>
+        <div class="stat-item"><div class="stat-label">Total Ganado</div><div class="stat-valor ganado">$<span id="statGanado">—</span></div></div>
+    </div>
+
+    <!-- Carreras disponibles -->
+    <div class="seccion-titulo">Carreras Disponibles</div>
+    <div id="carrerasDiv"></div>
+
+    <!-- Formulario de apuesta -->
+    <div class="form-apuesta">
+        <div class="seccion-titulo" style="margin-top:0">Realizar Apuesta</div>
+        <div id="seleccionResumen" style="font-size:.88rem;color:#444;margin-bottom:12px;display:none">
+            Seleccionado: <strong id="resumenCarrera">—</strong> / <strong id="resumenCaballo">—</strong>
+            <span id="resumenDiv" style="margin-left:8px;"></span>
+        </div>
+        <div class="form-grupo">
+            <label>Modalidad</label>
+            <select id="selModalidad">
+                <option value="">Seleccioná una modalidad...</option>
+            </select>
+        </div>
+        <div id="infoModalidad" style="font-size:.83rem;background:#f0f3f7;padding:8px 12px;border-radius:6px;margin-bottom:12px;display:none"></div>
+        <div class="form-grupo">
+            <label>Monto ($)</label>
+            <input type="number" id="inpMonto" min="1" step="1" placeholder="Ej: 500">
+        </div>
+        <button class="btn btn-primario" style="width:auto;padding:10px 24px" onclick="previsualizarApuesta()">Previsualizar apuesta</button>
+    </div>
+
+    <!-- Panel Confirmar -->
+    <div class="panel-confirmar" id="panelConfirmar">
+        <h3>Confirmar Apuesta</h3>
+        <div id="previewData"></div>
+        <div class="form-grupo" style="margin-top:14px">
+            <label>Confirmá con tu contraseña</label>
+            <input type="password" id="inpContrasena" placeholder="Contraseña">
+        </div>
+        <div style="display:flex;gap:10px;margin-top:10px">
+            <button class="btn btn-verde" onclick="confirmarApuesta()">Confirmar</button>
+            <button class="btn" style="background:#eee;color:#555" onclick="cancelarApuesta()">Cancelar</button>
+        </div>
+    </div>
+
+    <!-- Tipos de apuesta -->
+    <div class="seccion-titulo">Tipos de Apuesta</div>
+    <div id="modalidadesDiv"></div>
+
+    <!-- Historial -->
+    <div class="seccion-titulo">Mis Apuestas</div>
+    <div id="historialDiv"></div>
+
+    <script type="module">
+        import dispatcher from './CommandDispatcher.js';
+
+        const MODALIDADES_INFO = {
+            'Simple': 'Costo: monto. Pago si gana: monto × dividendo.',
+            'Triple':  'Costo: monto × 1.5. Pago: monto × div × 2 (si total caballo < $100.000) o × 3 (≥ $100.000).',
+            'Super':   'Costo: monto × 2. Pago: monto × div × 3 (si div ≥ 2) o × 4 (si div < 2).'
+        };
+
+        let apuestaEnCurso = null; // { fechaJornada, numeroCarrera, participacion }
+
+        dispatcher.mapFunctions({
+            tablero: (data) => renderTablero(data),
+            mensaje: (msg) => { mostrarMsg(msg, 'ok'); cancelarApuesta(); },
+            usuarioNoAutenticado: (url) => { window.parent.location.href = url; }
+        }, { onException: (msg) => mostrarMsg(msg, 'error') });
+
+        dispatcher.submit('/jugador/tablero', {}, 'GET');
+
+        function renderTablero(d) {
+            document.getElementById('statNombre').textContent  = d.nombreCompleto;
+            document.getElementById('statSaldo').textContent   = d.saldo.toFixed(2);
+            document.getElementById('statApostado').textContent= d.totalApostado.toFixed(2);
+            document.getElementById('statGanado').textContent  = d.totalGanado.toFixed(2);
+            window.parent.postMessage({ tipo: 'saldoActualizado', saldo: d.saldo }, '*');
+
+            renderCarrerasDisponibles(d.carrerasDisponibles);
+            renderModalidades(d.modalidades);
+            renderHistorial(d.apuestas);
+        }
+
+        function renderCarrerasDisponibles(lista) {
+            const div = document.getElementById('carrerasDiv');
+            if (!lista || lista.length === 0) {
+                div.innerHTML = '<p class="sin-carreras">No hay carreras abiertas para apostar.</p>';
+                return;
+            }
+            let html = '';
+            for (const c of lista) {
+                html += `<div class="carrera-disp">
+                    <div class="carrera-disp-header">
+                        <span class="carrera-disp-nombre">[${c.fechaJornada}] Carrera ${c.numero}: ${c.nombre}</span>
+                        <span class="badge badge-${c.estado.toLowerCase()}">${c.estado}</span>
+                    </div>
+                    <div class="caballos-lista">`;
+                for (const p of c.participaciones) {
+                    html += `<button class="caballo-btn" id="btn-${c.fechaJornada}-${c.numero}-${p.numero}"
+                        onclick="seleccionarCaballo('${c.fechaJornada}',${c.numero},'${c.nombre}',${p.numero},'${p.nombreCaballo}','${p.dividendo}',${p.dividendoNumerico ?? 'null'},${p.totalApostado})">
+                        [${p.numero}] ${p.nombreCaballo} — ${p.dividendo}
+                    </button>`;
+                }
+                html += `</div></div>`;
+            }
+            div.innerHTML = html;
+        }
+
+        function renderModalidades(lista) {
+            const sel = document.getElementById('selModalidad');
+            sel.innerHTML = '<option value="">Seleccioná una modalidad...</option>';
+            const div = document.getElementById('modalidadesDiv');
+            let html = '<ul style="margin:0;padding:0 0 0 18px;font-size:.88rem;color:#444">';
+            for (const nombre of lista) {
+                sel.innerHTML += `<option value="${nombre}">${nombre}</option>`;
+                html += `<li><strong>${nombre}</strong>: ${MODALIDADES_INFO[nombre] || ''}</li>`;
+            }
+            div.innerHTML = html + '</ul>';
+        }
+
+        function renderHistorial(lista) {
+            const div = document.getElementById('historialDiv');
+            if (!lista || lista.length === 0) {
+                div.innerHTML = '<p class="sin-carreras">No tenés apuestas realizadas.</p>';
+                return;
+            }
+            let html = `<table><thead><tr>
+                <th>Fecha</th><th>Carrera</th><th>Caballo</th><th>Monto</th>
+                <th>Modalidad</th><th>Cobrado</th><th>Dividendo</th><th>Estatus</th>
+            </tr></thead><tbody>`;
+            for (const a of lista) {
+                const cls = a.estatus === 'Finalizada' ? 'estado-finalizada' : 'estado-por-correr';
+                html += `<tr>
+                    <td>${a.fecha}</td>
+                    <td>${a.numeroCarrera}. ${a.nombreCarrera}</td>
+                    <td>[${a.numeroCaballo}] ${a.nombreCaballo}</td>
+                    <td>$${a.montoApostado.toFixed(2)}</td>
+                    <td>${a.tipoApuesta}</td>
+                    <td>$${a.montoCobrado.toFixed(2)}</td>
+                    <td>${a.dividendoFinal}</td>
+                    <td class="${cls}">${a.estatus}</td>
+                </tr>`;
+            }
+            div.innerHTML = html + '</tbody></table>';
+        }
+
+        document.getElementById('selModalidad').onchange = function () {
+            const info = document.getElementById('infoModalidad');
+            const txt = MODALIDADES_INFO[this.value];
+            info.style.display = txt ? 'block' : 'none';
+            if (txt) info.textContent = txt;
+        };
+
+        window.seleccionarCaballo = (fecha, numCarrera, nomCarrera, numPart, nomCaballo, div, divNum, totalApost) => {
+            document.querySelectorAll('.caballo-btn').forEach(b => b.classList.remove('seleccionado'));
+            const btn = document.getElementById(`btn-${fecha}-${numCarrera}-${numPart}`);
+            if (btn) btn.classList.add('seleccionado');
+            apuestaEnCurso = { fechaJornada: fecha, numeroCarrera: numCarrera, nombreCarrera: nomCarrera,
+                               numeroParticipacion: numPart, nombreCaballo: nomCaballo,
+                               dividendo: divNum, dividendoTexto: div, totalApostadoCaballo: totalApost };
+            document.getElementById('seleccionResumen').style.display = 'block';
+            document.getElementById('resumenCarrera').textContent = `Carrera ${numCarrera}: ${nomCarrera}`;
+            document.getElementById('resumenCaballo').textContent = `[${numPart}] ${nomCaballo}`;
+            document.getElementById('resumenDiv').textContent = `div: ${div}`;
+        };
+
+        window.previsualizarApuesta = () => {
+            if (!apuestaEnCurso) { mostrarMsg('Seleccioná un caballo primero', 'error'); return; }
+            const modalidad = document.getElementById('selModalidad').value;
+            const monto = parseFloat(document.getElementById('inpMonto').value);
+            if (!modalidad) { mostrarMsg('Seleccioná una modalidad', 'error'); return; }
+            if (!monto || monto < 1) { mostrarMsg('Monto inválido', 'error'); return; }
+
+            const costo = calcularCosto(monto, modalidad);
+            const pagoSiGana = apuestaEnCurso.dividendo !== null
+                ? calcularPago(monto, apuestaEnCurso.dividendo, modalidad, apuestaEnCurso.totalApostadoCaballo)
+                : 'N/A (dividendo no válido)';
+
+            apuestaEnCurso.monto = monto;
+            apuestaEnCurso.modalidad = modalidad;
+
+            const panel = document.getElementById('panelConfirmar');
+            document.getElementById('previewData').innerHTML = `
+                <div class="preview-item"><span class="preview-label">Carrera</span><span class="preview-valor">${apuestaEnCurso.numeroCarrera}. ${apuestaEnCurso.nombreCarrera}</span></div>
+                <div class="preview-item"><span class="preview-label">Caballo</span><span class="preview-valor">[${apuestaEnCurso.numeroParticipacion}] ${apuestaEnCurso.nombreCaballo}</span></div>
+                <div class="preview-item"><span class="preview-label">Dividendo actual</span><span class="preview-valor">${apuestaEnCurso.dividendoTexto}</span></div>
+                <div class="preview-item"><span class="preview-label">Monto apostado</span><span class="preview-valor">$${monto.toFixed(2)}</span></div>
+                <div class="preview-item"><span class="preview-label">Tipo de apuesta</span><span class="preview-valor">${modalidad}</span></div>
+                <div class="preview-item"><span class="preview-label">Se descuenta de tu saldo</span><span class="preview-valor">$${costo.toFixed(2)}</span></div>
+                <div class="preview-item"><span class="preview-label">Cobrarías si gana</span><span class="preview-valor">${typeof pagoSiGana === 'number' ? '$' + pagoSiGana.toFixed(2) : pagoSiGana}</span></div>
+            `;
+            document.getElementById('inpContrasena').value = '';
+            panel.style.display = 'block';
+            panel.scrollIntoView({ behavior: 'smooth' });
+        };
+
+        window.confirmarApuesta = () => {
+            const contrasena = document.getElementById('inpContrasena').value;
+            if (!contrasena) { mostrarMsg('Ingresá tu contraseña', 'error'); return; }
+            dispatcher.submit('/jugador/realizarApuesta', {
+                fechaJornada:         apuestaEnCurso.fechaJornada,
+                numeroCarrera:        apuestaEnCurso.numeroCarrera,
+                numeroParticipacion:  apuestaEnCurso.numeroParticipacion,
+                monto:                apuestaEnCurso.monto,
+                nombreModalidad:      apuestaEnCurso.modalidad,
+                contrasena:           contrasena
+            });
+        };
+
+        window.cancelarApuesta = () => {
+            document.getElementById('panelConfirmar').style.display = 'none';
+            apuestaEnCurso = null;
+            document.querySelectorAll('.caballo-btn').forEach(b => b.classList.remove('seleccionado'));
+            document.getElementById('seleccionResumen').style.display = 'none';
+        };
+
+        function calcularCosto(monto, modalidad) {
+            if (modalidad === 'Simple') return monto;
+            if (modalidad === 'Triple') return monto * 1.5;
+            if (modalidad === 'Super')  return monto * 2;
+            return monto;
+        }
+
+        function calcularPago(monto, dividendo, modalidad, totalApostadoCaballo) {
+            if (modalidad === 'Simple') return monto * dividendo;
+            if (modalidad === 'Triple') return monto * dividendo * (totalApostadoCaballo < 100000 ? 2 : 3);
+            if (modalidad === 'Super')  return monto * dividendo * (dividendo >= 2 ? 3 : 4);
+            return monto * dividendo;
+        }
+
+        function mostrarMsg(msg, tipo) {
+            const d = document.getElementById('msgDiv');
+            d.textContent = msg;
+            d.className = tipo === 'ok' ? 'msg-ok' : 'msg-error';
+            d.style.display = 'block';
+            setTimeout(() => d.style.display = 'none', 5000);
+        }
+    </script>
+</body>
+</html>

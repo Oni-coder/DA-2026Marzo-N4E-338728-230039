@@ -1,6 +1,7 @@
 package Obligatorio.obligatorioDisenioDeAplicaciones.Hipodromo.modelo.java.test;
 
 import lombok.Getter;
+import java.time.LocalDate;
 
 @Getter
 public class Apuesta {
@@ -10,6 +11,8 @@ public class Apuesta {
     private Modalidad modalidad;
     private Jugador jugador;
     private Participacion participacion;
+    private double montoCobrado = 0;
+    private LocalDate fechaApuesta = LocalDate.now();
 
     public Apuesta(double montoNeto, Modalidad modalidad, Jugador jugador, Participacion participacion) {
         this.montoNeto = montoNeto;
@@ -23,4 +26,7 @@ public class Apuesta {
         return modalidad.calcularPago(montoNeto, dividendo, participacion);
     }
 
+    public void acreditarPago(double monto) {
+        this.montoCobrado = monto;
+    }
 }

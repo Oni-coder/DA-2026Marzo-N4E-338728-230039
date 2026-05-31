@@ -1,5 +1,6 @@
 package Obligatorio.obligatorioDisenioDeAplicaciones.Hipodromo.modelo.java.test;
 
+import Obligatorio.obligatorioDisenioDeAplicaciones.Hipodromo.excepciones.HipodromoException;
 import lombok.Getter;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +16,10 @@ public class Jugador extends Usuario {
         this.saldo = saldo;
     }
 
-    public void realizarApuesta(Participacion participacion, double montoNeto, Modalidad modalidad) {
+    public void realizarApuesta(Participacion participacion, double montoNeto, Modalidad modalidad) throws HipodromoException {
+        double costo = modalidad.calcularCosto(montoNeto);
+        if (saldo < costo)
+            throw new HipodromoException("Saldo insuficiente. Saldo actual: " + saldo + ", costo de la apuesta: " + costo);
         Apuesta apuesta = new Apuesta(montoNeto, modalidad, this, participacion);
         descontarSaldo(apuesta.getCostoJugador());
         participacion.agregarApuesta(apuesta);
@@ -29,5 +33,4 @@ public class Jugador extends Usuario {
     public void descontarSaldo(double monto) {
         this.saldo -= monto;
     }
-
 }

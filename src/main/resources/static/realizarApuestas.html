@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Realizar Apuesta</title>
+    <link rel="stylesheet" href="CSSs/main.css">
+    <style>
+        html, body { height: 100%; overflow-y: auto; }
+    </style>
+</head>
+<body class="pagina-interna">
+    <h2>Realizar Apuesta</h2>
+
+    <div id="mensajeDiv" class="mensaje"></div>
+
+    <div class="jugador-info-bar">
+        <span class="nombre-jugador" id="nombreJugador">Cargando...</span>
+        <span class="saldo-actual">Saldo: $<span id="saldoActual">—</span></span>
+    </div>
+
+    <div class="form-apuesta">
+        <form id="formApuesta">
+            <div class="form-grupo">
+                <label for="carreraSelect">Carrera</label>
+                <select id="carreraSelect" name="carreraSelect" required>
+                    <option value="">Seleccioná una carrera disponible...</option>
+                </select>
+            </div>
+
+            <div class="form-grupo">
+                <label for="participaciones">Caballo</label>
+                <select id="participaciones" name="numeroParticipacion" required>
+                    <option value="">Primero seleccioná una carrera...</option>
+                </select>
+            </div>
+
+            <div class="form-grupo">
+                <label for="monto">Monto a apostar ($)</label>
+                <input type="number" id="monto" name="monto" min="1" step="1" placeholder="Ej: 500" required>
+            </div>
+
+            <div class="form-grupo">
+                <label for="nombreModalidad">Modalidad</label>
+                <select id="nombreModalidad" name="nombreModalidad" required>
+                    <option value="">Seleccioná una modalidad...</option>
+                </select>
+            </div>
+
+            <div id="infoModalidad" style="background:#f0f3f7;border-radius:7px;padding:10px 14px;margin-bottom:14px;font-size:0.85rem;color:#444;display:none;"></div>
+
+            <button type="submit" class="btn btn-verde" style="width:100%">Confirmar Apuesta</button>
+        </form>
+    </div>
+
+    <div id="sinCarreras" style="display:none;background:#fff;border-radius:10px;padding:20px;text-align:center;color:#888;">
+        No hay carreras disponibles para apostar en este momento.
+    </div>
+
+    <script type="module">
+        import dispatcher from './CommandDispatcher.js';
+
+        let jornadasData = [];
+
+        const MODALIDADES_INFO = {
+            'Simple': 'Costo: monto apostado. Pago: monto × dividendo.',
+            'Triple': 'Costo: monto × 1.5. Pago: monto × dividendo × 2 (si total caballo < $100.000) o × 3 (si ≥ $100.000).',
+            'Super':  'Costo: monto × 2. Pago: monto × dividendo × 3 (si dividendo ≥ 2) o × 4 (si dividendo < 2).'
+        };
+
+        dispatcher.mapFunctions({
+            jugador: (jugador) => {
+                document.getElementById('nombreJugador').textContent = jugador.nombreCompleto;
+                document.getElementById('saldoActual').textContent = jugador.saldo.toFixed(2);
+                // Notifica al sidebar del padre para que actualice el saldo en tiempo real
+                window.parent.postMessage({ tipo: 'saldoActualizado', saldo: jugador.saldo }, '*');
+            },
+            carrerasDisponibles: (jornadas) => {
+                jornadasData = jornadas;
+                renderCarreras(jornadas);
+            },
+            modalidades: (mods) => {
+                const sel = document.getElementById('nombreModalidad');
+                sel.innerHTML = '<option value="">Seleccioná una modalidad...</option>';
+                for (const m of mods) {
+                    sel.innerHTML += `<option value="${m.nombre}">${m.nombre}</option>`;
+                }
+            },
+            mensaje: (msg) => {
+                mostrarMensaje(msg, 'ok');
+                document.getElementById('formApuesta').reset();
+                document.getElementById('participaciones').innerHTML = '<option value="">Primero seleccioná una carrera...</option>';
+                document.getElementById('infoModalidad').style.display = 'none';
+            },
+            usuarioNoAutenticado: (url) => { window.parent.location.href = url; }
+        }, {
+            onException: (msg) => mostrarMensaje(msg, 'error')
+        });
+
+        dispatcher.submit('/apuestas/vistaConectada', {}, 'GET');
+
+        function mostrarMensaje(msg, tipo) {
+            const d = document.getElementById('mensajeDiv');
+            d.textContent = msg;
+            d.className = 'mensaje visible ' + (tipo === 'ok' ? 'mensaje-ok' : 'mensaje-error');
+            setTimeout(() => d.classList.remove('visible'), 5000);
+        }
+
+        function renderCarreras(jornadas) {
+            const sel = document.getElementById('carreraSelect');
+            const sinCarreras = document.getElementById('sinCarreras');
+            let count = 0;
+            sel.innerHTML = '<option value="">Seleccioná una carrera disponible...</option>';
+            for (const jornada of jornadas) {
+                for (const carrera of jornada.carreras) {
+                    if (carrera.aceptaApuestas) {
+                        sel.innerHTML += `<option value="${jornada.fecha}|${carrera.numero}">
+                            [${jornada.fecha}] Carrera ${carrera.numero}: ${carrera.nombre} (${carrera.estado})
+                        </option>`;
+                        count++;
+                    }
+                }
+            }
+            sinCarreras.style.display = count === 0 ? 'block' : 'none';
+        }
+
+        document.getElementById('carreraSelect').onchange = function () {
+            const val = this.value;
+            const sel = document.getElementById('participaciones');
+            sel.innerHTML = '<option value="">Seleccioná un caballo...</option>';
+            if (!val) return;
+            const [fecha, num] = val.split('|');
+            for (const jornada of jornadasData) {
+                if (jornada.fecha === fecha) {
+                    for (const carrera of jornada.carreras) {
+                        if (String(carrera.numero) === num) {
+                            for (const p of carrera.participaciones) {
+                                const div = p.dividendoValido
+                                    ? ` — dividendo: ${p.dividendo.toFixed(2)}`
+                                    : ' — sin dividendo aún';
+                                sel.innerHTML += `<option value="${p.numero}">[${p.numero}] ${p.nombreCaballo}${div}</option>`;
+                            }
+                        }
+                    }
+                }
+            }
+        };
+
+        document.getElementById('nombreModalidad').onchange = function () {
+            const info = document.getElementById('infoModalidad');
+            const txt  = MODALIDADES_INFO[this.value];
+            if (txt) {
+                info.textContent = txt;
+                info.style.display = 'block';
+            } else {
+                info.style.display = 'none';
+            }
+        };
+
+        document.getElementById('formApuesta').onsubmit = function (e) {
+            e.preventDefault();
+            const val = document.getElementById('carreraSelect').value;
+            if (!val) { alert('Seleccioná una carrera'); return; }
+            const [fechaJornada, numeroCarrera] = val.split('|');
+            const numeroParticipacion = document.getElementById('participaciones').value;
+            if (!numeroParticipacion) { alert('Seleccioná un caballo'); return; }
+            const monto = document.getElementById('monto').value;
+            const nombreModalidad = document.getElementById('nombreModalidad').value;
+            if (!nombreModalidad) { alert('Seleccioná una modalidad'); return; }
+
+            dispatcher.submit('/apuestas/realizar', {
+                fechaJornada,
+                numeroCarrera,
+                numeroParticipacion,
+                monto,
+                nombreModalidad
+            });
+        };
+    </script>
+</body>
+</html>

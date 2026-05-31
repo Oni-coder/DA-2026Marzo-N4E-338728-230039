@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hipódromo - Login Jugador</title>
+    <link rel="stylesheet" href="CSSs/main.css">
+</head>
+<body class="pagina-centrada">
+    <main>
+        <div class="tarjeta">
+            <h2>Acceso Jugador</h2>
+            <p class="subtitulo">Ingresá tu usuario y contraseña</p>
+            <form id="formLogin">
+                <div class="form-grupo">
+                    <label for="nombreUsuario">Usuario</label>
+                    <input type="text" id="nombreUsuario" name="nombreUsuario" placeholder="Ej: j1" required>
+                </div>
+                <div class="form-grupo">
+                    <label for="contrasena">Contraseña</label>
+                    <input type="password" id="contrasena" name="contrasena" placeholder="Contraseña" required>
+                </div>
+                <button type="submit" class="btn btn-primario">Ingresar</button>
+            </form>
+            <a href="index.html" class="enlace-volver">← Volver al inicio</a>
+        </div>
+    </main>
+
+    <script type="module">
+        import dispatcher from './CommandDispatcher.js';
+
+        dispatcher.mapFunctions({
+            loginExitoso: (url) => { window.location.href = url; }
+        }, {
+            onException: (msg) => alert(msg)
+        });
+
+        document.getElementById('formLogin').onsubmit = (e) => {
+            e.preventDefault();
+            const data = Object.fromEntries(new FormData(e.target).entries());
+            dispatcher.submit('/acceso/loginJugador', data);
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestión de Carreras</title>
+    <link rel="stylesheet" href="CSSs/main.css">
+    <style>
+        html, body { height: 100%; overflow-y: auto; }
+    </style>
+</head>
+<body class="pagina-interna">
+    <h2>Gestión de Carreras</h2>
+    <div id="mensajeDiv" class="mensaje"></div>
+    <div id="contenedor"><p>Cargando jornadas...</p></div>
+
+    <script type="module">
+        import dispatcher from './CommandDispatcher.js';
+
+        const contenedor = document.getElementById('contenedor');
+        const mensajeDiv = document.getElementById('mensajeDiv');
+
+        dispatcher.mapFunctions({
+            jornadas: (jornadas) => renderJornadas(jornadas),
+            mensaje: (msg) => mostrarMensaje(msg, 'ok'),
+            usuarioNoAutenticado: (url) => { window.parent.location.href = url; },
+            nombreCompleto: (_) => {}
+        }, {
+            onException: (msg) => mostrarMensaje(msg, 'error')
+        });
+
+        dispatcher.submit('/carreras/vistaConectada', {}, 'GET');
+
+        function mostrarMensaje(msg, tipo) {
+            mensajeDiv.textContent = msg;
+            mensajeDiv.className = 'mensaje visible ' + (tipo === 'ok' ? 'mensaje-ok' : 'mensaje-error');
+            setTimeout(() => mensajeDiv.classList.remove('visible'), 4000);
+        }
+
+        function renderJornadas(jornadas) {
+            if (!jornadas || jornadas.length === 0) {
+                contenedor.innerHTML = '<p>No hay jornadas registradas.</p>';
+                return;
+            }
+            let html = '';
+            for (const jornada of jornadas) {
+                html += `<div class="jornada">
+                    <div class="jornada-titulo">Jornada: ${jornada.fecha}</div>`;
+
+                for (const carrera of jornada.carreras) {
+                    const estadoL = carrera.estado.toLowerCase();
+                    let participHtml = '';
+                    for (const p of carrera.participaciones) {
+                        const ganadorMark = carrera.numeroGanador === p.numero ? ' &#127942;' : '';
+                        const divClass  = p.dividendoValido ? 'div-valido' : 'div-invalido';
+                        const divText   = p.dividendoValido ? p.dividendo.toFixed(2) : '—';
+                        participHtml += `<tr${carrera.numeroGanador === p.numero ? ' class="ganador"' : ''}>
+                            <td>${p.numero}</td>
+                            <td>${p.nombreCaballo}${ganadorMark}</td>
+                            <td class="${divClass}">${divText}</td>
+                            <td>$${p.totalApostado.toFixed(2)}</td>
+                            <td>${p.cantidadApuestas}</td>
+                        </tr>`;
+                    }
+
+                    let accionesHtml = '';
+                    if (carrera.estado === 'DEFINIDA') {
+                        accionesHtml = `<button class="btn btn-verde btn-sm"
+                            onclick="abrirCarrera('${jornada.fecha}', ${carrera.numero})">
+                            Abrir Carrera
+                        </button>`;
+                    } else if (carrera.estado === 'ESTABLE') {
+                        accionesHtml = `<button class="btn btn-naranja btn-sm"
+                            onclick="cerrarCarrera('${jornada.fecha}', ${carrera.numero})">
+                            Cerrar Carrera
+                        </button>`;
+                    } else if (carrera.estado === 'CERRADA') {
+                        let optsHtml = '';
+                        for (const p of carrera.participaciones) {
+                            optsHtml += `<option value="${p.numero}">[${p.numero}] ${p.nombreCaballo}</option>`;
+                        }
+                        accionesHtml = `<div class="finalizar-grupo">
+                            <label style="font-size:.85rem;font-weight:600;">Ganador:</label>
+                            <select id="ganador-${jornada.fecha}-${carrera.numero}">${optsHtml}</select>
+                            <button class="btn btn-oscuro btn-sm"
+                                onclick="finalizarCarrera('${jornada.fecha}', ${carrera.numero})">
+                                Finalizar y Liquidar
+                            </button>
+                        </div>`;
+                    }
+
+                    html += `<div class="carrera">
+                        <div class="carrera-cabecera">
+                            <div class="carrera-nombre-num">
+                                <span class="carrera-num">${carrera.numero}</span>
+                                <span class="carrera-nombre">${carrera.nombre}</span>
+                            </div>
+                            <div class="carrera-meta">
+                                <span class="badge badge-${estadoL}">${carrera.estado}</span>
+                                <span class="pozo">Pozo: $${carrera.pozo.toFixed(2)}</span>
+                            </div>
+                        </div>
+                        <table class="tabla-participaciones">
+                            <thead>
+                                <tr>
+                                    <th>N°</th>
+                                    <th>Caballo</th>
+                                    <th>Dividendo</th>
+                                    <th>Total Apostado</th>
+                                    <th>Apuestas</th>
+                                </tr>
+                            </thead>
+                            <tbody>${participHtml}</tbody>
+                        </table>
+                        ${accionesHtml ? `<div class="carrera-acciones">${accionesHtml}</div>` : ''}
+                    </div>`;
+                }
+                html += '</div>';
+            }
+            contenedor.innerHTML = html;
+        }
+
+        window.abrirCarrera = (fecha, numero) => {
+            dispatcher.submit('/carreras/abrir', { fechaJornada: fecha, numeroCarrera: numero });
+        };
+
+        window.cerrarCarrera = (fecha, numero) => {
+            dispatcher.submit('/carreras/cerrar', { fechaJornada: fecha, numeroCarrera: numero });
+        };
+
+        window.finalizarCarrera = (fecha, numero) => {
+            const sel = document.getElementById('ganador-' + fecha + '-' + numero);
+            dispatcher.submit('/carreras/finalizar', {
+                fechaJornada: fecha,
+                numeroCarrera: numero,
+                numeroParticipacionGanadora: sel.value
+            });
+        };
+    </script>
+</body>
+</html>

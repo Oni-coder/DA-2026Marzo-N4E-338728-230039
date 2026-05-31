@@ -8,13 +8,18 @@ import java.util.List;
 public class Participacion {
 
     private int numero;
-    private Double dividendo; // null mientras no haya apuestas suficientes
+    private Double dividendo;
     private Caballo caballo;
     private List<Apuesta> apuestas = new ArrayList<>();
+    private Carrera carrera;
 
     public Participacion(int numero, Caballo caballo) {
         this.numero = numero;
         this.caballo = caballo;
+    }
+
+    public void setCarrera(Carrera carrera) {
+        this.carrera = carrera;
     }
 
     public void agregarApuesta(Apuesta apuesta) {
@@ -22,10 +27,13 @@ public class Participacion {
     }
 
     public double getTotalApostado() {
-        return apuestas.stream().mapToDouble(Apuesta::getMontoNeto).sum();
+        double total = 0;
+        for (Apuesta apuesta : apuestas) {
+            total += apuesta.getMontoNeto();
+        }
+        return total;
     }
 
-    // pozoNeto = total apostado en la carrera ya descontada la comisión
     public void recalcularDividendo(double pozoNeto) {
         double totalApostado = getTotalApostado();
         if (totalApostado == 0) {
@@ -38,5 +46,4 @@ public class Participacion {
     public boolean isDividendoValido() {
         return dividendo != null && dividendo > 1;
     }
-
 }

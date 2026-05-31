@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hipódromo - Jugador</title>
+    <link rel="stylesheet" href="CSSs/main.css">
+</head>
+<body>
+    <div class="app-layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="app-logo">Hipódromo</div>
+                <div class="usuario-info" id="nombreCompleto">Cargando...</div>
+                <div class="saldo-info">Saldo: $<span id="saldo">—</span></div>
+            </div>
+            <nav class="sidebar-nav">
+                <button class="sidebar-btn activo"
+                    onclick="cargarContenido('tableroJugador.html', this)">
+                    Tablero
+                </button>
+            </nav>
+            <div class="sidebar-footer">
+                <button class="btn-logout" onclick="logout()">Cerrar Sesión</button>
+            </div>
+        </aside>
+        <main class="contenido-principal">
+            <iframe id="frame" src="tableroJugador.html"></iframe>
+        </main>
+    </div>
+
+    <script type="module">
+        import dispatcher from './CommandDispatcher.js';
+
+        dispatcher.mapFunctions({
+            nombreCompleto: (nombre) => {
+                document.getElementById('nombreCompleto').textContent = nombre;
+            },
+            saldo: (s) => {
+                document.getElementById('saldo').textContent = s.toFixed(2);
+            },
+            usuarioNoAutenticado: (url) => { window.location.href = url; }
+        }, {
+            onException: (msg) => alert(msg)
+        });
+
+        dispatcher.submit('/menuJugador/vistaConectada', {}, 'GET');
+
+        // Escucha actualizaciones de saldo enviadas desde el iframe
+        window.addEventListener('message', (event) => {
+            if (event.data && event.data.tipo === 'saldoActualizado') {
+                document.getElementById('saldo').textContent = event.data.saldo.toFixed(2);
+            }
+        });
+
+        window.cargarContenido = (pagina, btn) => {
+            document.getElementById('frame').src = pagina;
+            document.querySelectorAll('.sidebar-btn').forEach(b => b.classList.remove('activo'));
+            btn.classList.add('activo');
+        };
+
+        window.logout = () => {
+            dispatcher.submit('/acceso/logoutJugador', {});
+        };
+    </script>
+</body>
+</html>
