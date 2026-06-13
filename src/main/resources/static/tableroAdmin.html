@@ -194,11 +194,11 @@
             if (c.estado === 'DEFINIDA') {
                 accionesHtml = `<button class="btn btn-verde btn-sm" onclick="abrirCarrera(${c.numero})">Abrir Carrera</button>`;
             }
-            if (c.estado === 'ABIERTA' || c.estado === 'ESTABLE') {
-                if (c.estado === 'ESTABLE')
-                    accionesHtml += `<button class="btn btn-naranja btn-sm" onclick="cerrarCarrera(${c.numero})">Cerrar Carrera</button>`;
-                else
-                    accionesHtml += `<button class="btn btn-naranja btn-sm" onclick="cerrarCarrera(${c.numero})">Cerrar Carrera</button>`;
+            if (c.estado === 'ABIERTA') {
+                accionesHtml += `<span style="font-size:.82rem;color:#888;font-style:italic;">Esperando dividendos válidos para todos los caballos...</span>`;
+            }
+            if (c.estado === 'ESTABLE') {
+                accionesHtml += `<button class="btn btn-naranja btn-sm" onclick="cerrarCarrera(${c.numero})">Cerrar Carrera</button>`;
             }
             if (c.estado === 'CERRADA') {
                 let opts = '';
