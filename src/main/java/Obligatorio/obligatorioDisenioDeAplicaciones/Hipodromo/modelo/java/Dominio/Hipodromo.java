@@ -26,13 +26,11 @@ public class Hipodromo {
     }
 
     public Jornada getOCrearJornada(java.time.LocalDate fecha) {
-        return jornadas.stream()
-                .filter(j -> j.getFecha().equals(fecha))
-                .findFirst()
-                .orElseGet(() -> {
-                    Jornada j = new Jornada(fecha);
-                    jornadas.add(j);
-                    return j;
-                });
+        for (Jornada j : jornadas) {
+            if (j.getFecha().equals(fecha)) return j;
+        }
+        Jornada j = new Jornada(fecha);
+        jornadas.add(j);
+        return j;
     }
 }
