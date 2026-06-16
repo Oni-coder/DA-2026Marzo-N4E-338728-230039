@@ -3,7 +3,7 @@ package Obligatorio.obligatorioDisenioDeAplicaciones.Hipodromo.servicios.fachada
 import Obligatorio.obligatorioDisenioDeAplicaciones.Hipodromo.dtos.TableroAdminDto;
 import Obligatorio.obligatorioDisenioDeAplicaciones.Hipodromo.dtos.TableroJugadorDto;
 import Obligatorio.obligatorioDisenioDeAplicaciones.Hipodromo.excepciones.HipodromoException;
-import Obligatorio.obligatorioDisenioDeAplicaciones.Hipodromo.modelo.java.test.*;
+import Obligatorio.obligatorioDisenioDeAplicaciones.Hipodromo.modelo.java.Dominio.*;
 import Obligatorio.obligatorioDisenioDeAplicaciones.Hipodromo.observador.Observable;
 import Obligatorio.obligatorioDisenioDeAplicaciones.Hipodromo.servicios.ServicioCarreras;
 import Obligatorio.obligatorioDisenioDeAplicaciones.Hipodromo.servicios.ServicioUsuarios;

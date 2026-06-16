@@ -1,12 +1,13 @@
 package Obligatorio.obligatorioDisenioDeAplicaciones.Hipodromo.dtos;
 
-import Obligatorio.obligatorioDisenioDeAplicaciones.Hipodromo.modelo.java.test.Carrera;
-import Obligatorio.obligatorioDisenioDeAplicaciones.Hipodromo.modelo.java.test.Jornada;
-import Obligatorio.obligatorioDisenioDeAplicaciones.Hipodromo.modelo.java.test.Participacion;
 import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import Obligatorio.obligatorioDisenioDeAplicaciones.Hipodromo.modelo.java.Dominio.Carrera;
+import Obligatorio.obligatorioDisenioDeAplicaciones.Hipodromo.modelo.java.Dominio.Jornada;
+import Obligatorio.obligatorioDisenioDeAplicaciones.Hipodromo.modelo.java.Dominio.Participacion;
 
 @Getter
 public class CarreraDisponibleDto {

@@ -1,14 +1,15 @@
 package Obligatorio.obligatorioDisenioDeAplicaciones.Hipodromo.dtos;
 
-import Obligatorio.obligatorioDisenioDeAplicaciones.Hipodromo.modelo.java.test.Apuesta;
-import Obligatorio.obligatorioDisenioDeAplicaciones.Hipodromo.modelo.java.test.Carrera;
-import Obligatorio.obligatorioDisenioDeAplicaciones.Hipodromo.modelo.java.test.Jornada;
-import Obligatorio.obligatorioDisenioDeAplicaciones.Hipodromo.modelo.java.test.Jugador;
-import Obligatorio.obligatorioDisenioDeAplicaciones.Hipodromo.modelo.java.test.Modalidad;
 import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import Obligatorio.obligatorioDisenioDeAplicaciones.Hipodromo.modelo.java.Dominio.Apuesta;
+import Obligatorio.obligatorioDisenioDeAplicaciones.Hipodromo.modelo.java.Dominio.Carrera;
+import Obligatorio.obligatorioDisenioDeAplicaciones.Hipodromo.modelo.java.Dominio.Jornada;
+import Obligatorio.obligatorioDisenioDeAplicaciones.Hipodromo.modelo.java.Dominio.Jugador;
+import Obligatorio.obligatorioDisenioDeAplicaciones.Hipodromo.modelo.java.Dominio.Modalidad;
 
 @Getter
 public class TableroJugadorDto {

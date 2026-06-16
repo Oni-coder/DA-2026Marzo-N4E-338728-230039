@@ -1,8 +1,8 @@
 package Obligatorio.obligatorioDisenioDeAplicaciones.Hipodromo.presentador;
 
 import Obligatorio.obligatorioDisenioDeAplicaciones.Hipodromo.excepciones.HipodromoException;
-import Obligatorio.obligatorioDisenioDeAplicaciones.Hipodromo.modelo.java.test.Administrador;
-import Obligatorio.obligatorioDisenioDeAplicaciones.Hipodromo.modelo.java.test.Jugador;
+import Obligatorio.obligatorioDisenioDeAplicaciones.Hipodromo.modelo.java.Dominio.Administrador;
+import Obligatorio.obligatorioDisenioDeAplicaciones.Hipodromo.modelo.java.Dominio.Jugador;
 import Obligatorio.obligatorioDisenioDeAplicaciones.Hipodromo.servicios.fachada.FachadaServicios;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.context.annotation.Scope;

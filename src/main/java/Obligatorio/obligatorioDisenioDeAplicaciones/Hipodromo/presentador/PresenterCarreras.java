@@ -2,8 +2,8 @@ package Obligatorio.obligatorioDisenioDeAplicaciones.Hipodromo.presentador;
 
 import Obligatorio.obligatorioDisenioDeAplicaciones.Hipodromo.dtos.JornadaDto;
 import Obligatorio.obligatorioDisenioDeAplicaciones.Hipodromo.excepciones.HipodromoException;
-import Obligatorio.obligatorioDisenioDeAplicaciones.Hipodromo.modelo.java.test.Administrador;
-import Obligatorio.obligatorioDisenioDeAplicaciones.Hipodromo.modelo.java.test.Jornada;
+import Obligatorio.obligatorioDisenioDeAplicaciones.Hipodromo.modelo.java.Dominio.Administrador;
+import Obligatorio.obligatorioDisenioDeAplicaciones.Hipodromo.modelo.java.Dominio.Jornada;
 import Obligatorio.obligatorioDisenioDeAplicaciones.Hipodromo.observador.Observable;
 import Obligatorio.obligatorioDisenioDeAplicaciones.Hipodromo.observador.Observador;
 import Obligatorio.obligatorioDisenioDeAplicaciones.Hipodromo.servicios.fachada.FachadaServicios;

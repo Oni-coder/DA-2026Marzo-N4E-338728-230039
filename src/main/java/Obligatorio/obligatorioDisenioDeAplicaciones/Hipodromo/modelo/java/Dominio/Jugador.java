@@ -1,4 +1,4 @@
-package Obligatorio.obligatorioDisenioDeAplicaciones.Hipodromo.modelo.java.test;
+package Obligatorio.obligatorioDisenioDeAplicaciones.Hipodromo.modelo.java.Dominio;
 
 import Obligatorio.obligatorioDisenioDeAplicaciones.Hipodromo.excepciones.HipodromoException;
 import lombok.Getter;

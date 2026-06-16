@@ -1,8 +1,8 @@
 package Obligatorio.obligatorioDisenioDeAplicaciones.Hipodromo.servicios;
 
 import Obligatorio.obligatorioDisenioDeAplicaciones.Hipodromo.excepciones.HipodromoException;
-import Obligatorio.obligatorioDisenioDeAplicaciones.Hipodromo.modelo.java.test.Administrador;
-import Obligatorio.obligatorioDisenioDeAplicaciones.Hipodromo.modelo.java.test.Jugador;
+import Obligatorio.obligatorioDisenioDeAplicaciones.Hipodromo.modelo.java.Dominio.Administrador;
+import Obligatorio.obligatorioDisenioDeAplicaciones.Hipodromo.modelo.java.Dominio.Jugador;
 
 import java.util.ArrayList;
 import java.util.HashSet;

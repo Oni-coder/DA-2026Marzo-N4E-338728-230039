@@ -1,6 +1,6 @@
 package Obligatorio.obligatorioDisenioDeAplicaciones.Hipodromo.dtos;
 
-import Obligatorio.obligatorioDisenioDeAplicaciones.Hipodromo.modelo.java.test.Jugador;
+import Obligatorio.obligatorioDisenioDeAplicaciones.Hipodromo.modelo.java.Dominio.Jugador;
 import lombok.Getter;
 
 @Getter

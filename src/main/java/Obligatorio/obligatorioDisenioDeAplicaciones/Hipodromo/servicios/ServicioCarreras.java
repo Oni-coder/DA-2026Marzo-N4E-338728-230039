@@ -1,7 +1,7 @@
 package Obligatorio.obligatorioDisenioDeAplicaciones.Hipodromo.servicios;
 
 import Obligatorio.obligatorioDisenioDeAplicaciones.Hipodromo.excepciones.HipodromoException;
-import Obligatorio.obligatorioDisenioDeAplicaciones.Hipodromo.modelo.java.test.*;
+import Obligatorio.obligatorioDisenioDeAplicaciones.Hipodromo.modelo.java.Dominio.*;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
