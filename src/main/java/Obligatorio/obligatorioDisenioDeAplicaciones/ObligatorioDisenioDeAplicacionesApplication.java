@@ -1,7 +1,7 @@
 package Obligatorio.obligatorioDisenioDeAplicaciones;
 
 import Obligatorio.obligatorioDisenioDeAplicaciones.Hipodromo.excepciones.HipodromoException;
-import Obligatorio.obligatorioDisenioDeAplicaciones.Hipodromo.modelo.java.test.*;
+import Obligatorio.obligatorioDisenioDeAplicaciones.Hipodromo.modelo.java.Dominio.*;
 import Obligatorio.obligatorioDisenioDeAplicaciones.Hipodromo.servicios.fachada.FachadaServicios;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
