@@ -41,6 +41,7 @@
         });
 
         dispatcher.submit('/menuAdmin/vistaConectada', {}, 'GET');
+        dispatcher.connectSSE('/menuAdmin/registrarSSE');
 
         window.cargarContenido = (pagina, btn) => {
             document.getElementById('frame').src = pagina;

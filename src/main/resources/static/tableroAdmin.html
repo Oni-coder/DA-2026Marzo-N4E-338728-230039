@@ -93,6 +93,7 @@
         }, { onException: (msg) => mostrarMsg(msg, 'error') });
 
         dispatcher.submit('/admin/tablero', {}, 'GET');
+        dispatcher.connectSSE('/admin/registrarSSE');
 
         function renderTablero(d) {
             document.getElementById('tableroDiv').style.display = 'block';

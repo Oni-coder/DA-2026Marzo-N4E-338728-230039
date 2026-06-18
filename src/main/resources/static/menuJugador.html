@@ -45,6 +45,7 @@
         });
 
         dispatcher.submit('/menuJugador/vistaConectada', {}, 'GET');
+        dispatcher.connectSSE('/menuJugador/registrarSSE');
 
         // Escucha actualizaciones de saldo enviadas desde el iframe
         window.addEventListener('message', (event) => {

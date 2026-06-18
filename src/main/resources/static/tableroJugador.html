@@ -114,6 +114,7 @@
         }, { onException: (msg) => mostrarMsg(msg, 'error') });
 
         dispatcher.submit('/jugador/tablero', {}, 'GET');
+        dispatcher.connectSSE('/jugador/registrarSSE');
 
         function renderTablero(d) {
             document.getElementById('statNombre').textContent  = d.nombreCompleto;

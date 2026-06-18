@@ -3,18 +3,22 @@ package Obligatorio.obligatorioDisenioDeAplicaciones.Hipodromo.presentador;
 import java.time.LocalDate;
 
 import org.springframework.context.annotation.Scope;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.SessionAttribute;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import Obligatorio.obligatorioDisenioDeAplicaciones.Hipodromo.excepciones.HipodromoException;
 import Obligatorio.obligatorioDisenioDeAplicaciones.Hipodromo.modelo.java.Dominio.Administrador;
 import Obligatorio.obligatorioDisenioDeAplicaciones.Hipodromo.observador.Observable;
 import Obligatorio.obligatorioDisenioDeAplicaciones.Hipodromo.observador.Observador;
 import Obligatorio.obligatorioDisenioDeAplicaciones.Hipodromo.servicios.fachada.FachadaServicios;
+import Obligatorio.obligatorioDisenioDeAplicaciones.Hipodromo.utils.ConexionNavegador;
+import jakarta.annotation.PreDestroy;
 
 @RestController
 @Scope("session")
@@ -22,11 +26,19 @@ import Obligatorio.obligatorioDisenioDeAplicaciones.Hipodromo.servicios.fachada.
 public class PresenterAdmin implements Observador {
 
     private final FachadaServicios fachada;
+    private final ConexionNavegador conexionNavegador;
     private LocalDate jornadaActual;
 
-    public PresenterAdmin(FachadaServicios fachada) {
+    public PresenterAdmin(FachadaServicios fachada, ConexionNavegador conexionNavegador) {
         this.fachada = fachada;
+        this.conexionNavegador = conexionNavegador;
         fachada.agregarObservador(this);
+    }
+
+    @GetMapping(value = "/registrarSSE", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public SseEmitter registrarSSE() {
+        conexionNavegador.conectarSSE();
+        return conexionNavegador.getUltimaConexion();
     }
 
     @GetMapping("/tablero")
@@ -86,7 +98,19 @@ public class PresenterAdmin implements Observador {
 
     @Override
     public void actualizar(Object evento, Observable origen) {
-        if (FachadaServicios.Eventos.cambioEnCarreras.equals(evento))
-            System.out.println("PresenterAdmin: notificado de cambio en carreras.");
+        if (FachadaServicios.Eventos.cambioEnCarreras.equals(evento) && jornadaActual != null) {
+            try {
+                conexionNavegador.enviarJSON(Commands.create(tableroCommand()));
+            } catch (HipodromoException e) {
+                System.out.println("PresenterAdmin: error al construir tablero para push SSE: " + e.getMessage());
+            }
+        }
+    }
+
+    // Se ejecuta cuando la sesión (y por lo tanto este bean @Scope("session")) se destruye:
+    // logout, invalidate() o expiración de sesión. Evita observadores "fantasma" en la fachada.
+    @PreDestroy
+    public void quitarObservador() {
+        fachada.quitarObservador(this);
     }
 }
